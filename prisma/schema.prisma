@@ -4,6 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -54,6 +56,8 @@ model User {
   role          String?   @default("user")
   accounts      Account[]
   sessions      Session[]
+  novels        Novel[]
+  ratings       Rating[] // Menambahkan relasi ke Rating
 
   @@map("users")
 }
@@ -65,4 +69,39 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model Novel {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  category  String
+  tags      String[]
+  authorId  String // Mengubah ke String untuk mencocokkan tipe `id` di User
+  author    User      @relation(fields: [authorId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  ratings   Rating[]
+  chapters  Chapter[]
+}
+
+model Chapter {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  number    Int
+  novelId   Int
+  novel     Novel    @relation(fields: [novelId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rating {
+  id      Int    @id @default(autoincrement())
+  rating  Int
+  comment String
+  novelId Int
+  userId  String // Mengubah ke String untuk mencocokkan tipe `id` di User
+  user    User   @relation(fields: [userId], references: [id]) // Relasi dengan User
+  novel   Novel  @relation(fields: [novelId], references: [id])
 }

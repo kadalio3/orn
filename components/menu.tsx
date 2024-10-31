@@ -34,7 +34,7 @@ const Menu: React.FC<MenuProps> = ({ session }) => {
               <Link href="/dashboard">Dashboard</Link>
             </li>
             <li className="hover:text-gray-800">
-              <Link href="/product">Product</Link>
+              <Link href="/product">Novel</Link>
             </li>
             {session.user?.role === "admin" ? (
               <li className="hover:text-gray-800">
