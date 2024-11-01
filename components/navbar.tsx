@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { auth } from "@/auth";
-import Menu from "@/components/menu";
+import { Menu } from "@/components/menu";
 
 
 const Navbar = async () => {

@@ -1,7 +1,15 @@
-export default function Home() {
+import { MenuHome } from "@/components/menu";
+import { auth } from "@/auth";
+
+export default async function Home() {
+  const session = await auth();
+  
   return (
     <div className="max-w-screen-xl mx-auto py-6 px-4">
-      <h1 className="text-2xl">Home</h1>
+      <div className="flex items-center justify-center">
+        <MenuHome session={session} />
+      </div>
+
       <div className="w-full h-full">
         <div className="flex justify-between items-center py-4">
           <h2 className="text-2xl font-bold">New Comer</h2>
@@ -31,7 +39,7 @@ export default function Home() {
         </section>
       </div>
       <div className="w-full h-full">
-      <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-4">
           <h2 className="text-2xl font-bold">Popular</h2>
           <button className="px-4 py-2 text-sm text-white bg-blue-400 hover:bg-blue-700 rounded-md">
             Lihat Semua

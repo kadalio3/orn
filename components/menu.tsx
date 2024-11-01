@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -10,7 +11,7 @@ interface MenuProps {
   session: Session | null;
 }
 
-const Menu: React.FC<MenuProps> = ({ session }) => {
+export const Menu: React.FC<MenuProps> = ({ session }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const toggleDropdown = () => setDropdownVisible(!dropdownVisible);
   const router = useRouter();
@@ -30,11 +31,13 @@ const Menu: React.FC<MenuProps> = ({ session }) => {
         </li>
         {session && (
           <>
-            <li className="hover:text-gray-800">
+            {session.user?.role === "admin" ? (
+              <li className="hover:text-gray-800">
               <Link href="/dashboard">Dashboard</Link>
             </li>
+            ) : null}
             <li className="hover:text-gray-800">
-              <Link href="/product">Novel</Link>
+              <Link href="/novel">Novel</Link>
             </li>
             {session.user?.role === "admin" ? (
               <li className="hover:text-gray-800">
@@ -110,4 +113,26 @@ const Menu: React.FC<MenuProps> = ({ session }) => {
   );
 };
 
-export default Menu;
+export const MenuHome: React.FC<MenuProps> = ({ session }) => {
+  return (
+    <div className="flex items-center gap-3">
+      <ul className="hidden md:flex items-center gap-4 mr-4 text-2xl font-semibold text-gray-600">
+        <li className="hover:text-gray-800">
+          <Link href="/">Home</Link>
+        </li>
+        <li className="hover:text-gray-800">
+          <Link href="/event">Event</Link>
+        </li>
+        <li className="hover:text-gray-800">
+          <Link href="/kids">Kids</Link>
+        </li>
+        <li className="hover:text-gray-800">
+          <Link href="/teen">Teen</Link>
+        </li>
+        <li className="hover:text-gray-800">
+          <Link href="/ebook">Ebook</Link>
+        </li>
+      </ul>
+    </div>
+  );
+};
