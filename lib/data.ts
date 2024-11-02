@@ -14,3 +14,18 @@ export const getUsers = async () => {
         console.log(error);
     }
 }
+
+export const getCategory = async () => {
+    const session = await auth();
+    if (!session || !session.user) redirect("/dashboard");
+
+    try {
+        const categories = await prisma.category.findMany({
+            include: { user: { select: { name: true } } },
+        }); // Mengambil semua kategori
+        return categories;
+    } catch (error) {
+        console.log("Error fetching categories:", error);
+        return [];
+    }
+};
