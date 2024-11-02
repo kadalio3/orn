@@ -20,3 +20,7 @@ export const RegisterSchema = object({
   message: "Password does not match",
   path: ["ConfirmPassword"],
 });
+
+export const CategorySchema = object({
+  name: string().min(1, "Name is required"),
+});

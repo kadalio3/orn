@@ -5,6 +5,7 @@ const CategoryTable = async () => {
   const categories = await getCategory();
   if (!categories?.length)
     return <h1 className="text-2xl">No Category Found</h1>;
+
   return (
     <table className="w-full bg-white mt-3">
       <thead className="border-b border-gray-100">
@@ -17,12 +18,16 @@ const CategoryTable = async () => {
         </tr>
       </thead>
       <tbody>
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <tr key={category.id} className="border-b border-gray-100">
-            <td className="py-3 px-6">{category.id}</td>
+            <td className="py-3 px-6">{index + 1}</td>
             <td className="py-3 px-6">{category.name}</td>
-            <td className="py-3 px-6">{category.createdAt}</td>
-            <td className="py-3 px-6">{category.updatedAt}</td>
+            <td className="py-3 px-6">
+              {category.createdAt.toString()}
+            </td>
+            <td className="py-3 px-6">
+              {category.updatedAt.toString()}
+            </td>
             <td className="py-3 px-6">
               <div className="flex space-x-2">
                 <button className="text-blue-500 hover:text-blue-700">

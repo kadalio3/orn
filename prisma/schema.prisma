@@ -72,7 +72,7 @@ model Category {
   novels    Novel[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String // Menambahkan field `userId`
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("category")

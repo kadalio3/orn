@@ -20,9 +20,7 @@ export const getCategory = async () => {
     if (!session || !session.user) redirect("/dashboard");
 
     try {
-        const categories = await prisma.category.findMany({
-            include: { user: { select: { name: true } } },
-        }); // Mengambil semua kategori
+        const categories = await prisma.category.findMany();
         return categories;
     } catch (error) {
         console.log("Error fetching categories:", error);

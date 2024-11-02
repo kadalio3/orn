@@ -1,5 +1,5 @@
 "use server";
-import { RegisterSchema, SignInSchema } from "@/lib/zod";
+import { RegisterSchema, SignInSchema, CategorySchema } from "@/lib/zod";
 import { hashSync } from "bcrypt-ts";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -62,3 +62,43 @@ export const signInCredentials= async(prevState: unknown, formData:FormData) => 
         throw error;
     }
 }
+
+
+export const createCategory = async (prevState: any, formData: FormData, userId: string) => {
+    const validatedFields = CategorySchema.safeParse(
+      Object.fromEntries(formData.entries())
+    );
+  
+    if (!validatedFields.success) {
+      return {
+        Error: validatedFields.error.flatten().fieldErrors,
+      };
+    }
+  
+    const { name } = validatedFields.data;
+  
+    try {
+      // Periksa apakah userId ada di database
+      const userExists = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+  
+      if (!userExists) {
+        return { message: "User not found" };
+      }
+  
+      // Buat kategori baru dengan relasi ke user yang valid
+      await prisma.category.create({
+        data: {
+          name: name,
+          user: {
+            connect: { id: userId },
+          },
+        },
+      });
+    } catch (error) {
+      return { message: "Failed to create category" };
+    }
+  
+    redirect("/category");
+  };
