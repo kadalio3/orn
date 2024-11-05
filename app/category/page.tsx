@@ -1,5 +1,4 @@
 import CategoryTable from "@/components/auth/category-table"
-import UserTable from "@/components/auth/user-table"
 import Breadcrumb from "@/components/breadcrumb"
 import type { Metadata } from "next"
 

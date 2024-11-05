@@ -1,9 +1,9 @@
 "use server";
-import { RegisterSchema, SignInSchema, CategorySchema } from "@/lib/zod";
+import { RegisterSchema, SignInSchema, AddCategorySchema } from "@/lib/zod";
 import { hashSync } from "bcrypt-ts";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { AuthError } from "next-auth";
 
 //register
@@ -64,41 +64,36 @@ export const signInCredentials= async(prevState: unknown, formData:FormData) => 
 }
 
 
-export const createCategory = async (prevState: any, formData: FormData, userId: string) => {
-    const validatedFields = CategorySchema.safeParse(
-      Object.fromEntries(formData.entries())
-    );
-  
-    if (!validatedFields.success) {
-      return {
-        Error: validatedFields.error.flatten().fieldErrors,
-      };
-    }
-  
-    const { name } = validatedFields.data;
-  
-    try {
-      // Periksa apakah userId ada di database
-      const userExists = await prisma.user.findUnique({
-        where: { id: userId },
-      });
-  
-      if (!userExists) {
-        return { message: "User not found" };
-      }
-  
-      // Buat kategori baru dengan relasi ke user yang valid
-      await prisma.category.create({
-        data: {
-          name: name,
-          user: {
-            connect: { id: userId },
-          },
-        },
-      });
-    } catch (error) {
-      return { message: "Failed to create category" };
-    }
-  
-    redirect("/category");
-  };
+export const createCategory = async (prevState: any, formData: FormData) => {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return { message: "User is not authenticated or missing user ID" };
+  }
+
+  // Parse and validate form data
+  const validatedFields = AddCategorySchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (!validatedFields.success) {
+    return {
+      error: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    // Directly set userId as a string
+    await prisma.category.create({
+      data: {
+        name: validatedFields.data.name,
+        user: { connect: { id: session.user.id } },
+      },
+    });
+
+    return { message: "Category created successfully", success: true };
+
+  } catch (error) {
+    console.error("Failed to create category:", error);
+    return { message: "Failed to create category", success: false };
+  }
+};

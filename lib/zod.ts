@@ -1,4 +1,4 @@
-import { object, string } from "zod";
+import { object, string, z } from "zod";
 
 export const SignInSchema = object({
   email: string().email("Invalid Email"),
@@ -21,6 +21,6 @@ export const RegisterSchema = object({
   path: ["ConfirmPassword"],
 });
 
-export const CategorySchema = object({
-  name: string().min(1, "Name is required"),
-});
+export const AddCategorySchema = object({
+  name: string().min(1, "Category name is required"),
+})
