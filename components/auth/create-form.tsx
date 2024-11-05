@@ -1,20 +1,20 @@
+// components/auth/create-form.tsx
+
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useFormState } from 'react-dom';
-import { SubmitButton } from '@/components/button';
-import { createCategory } from '@/lib/actions';
+import { useFormState } from "react-dom";
+import { SubmitButton } from "@/components/button";
+import { createCategory } from "@/lib/actions";
 
 // Define types for form action parameters
 type FormDataEntry = { [key: string]: FormDataEntryValue };
 
-const ProductForm = () => {
-  const router = useRouter();
+const ProductForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [state, formAction] = useFormState(async (prevState: any, formData: FormData) => {
     const response = await createCategory(prevState, formData);
     
     if (response.success) {
-      router.push("/category"); // Redirect after successful creation
+      onSuccess(); // Close modal on successful creation
     }
     
     return response; // Return response to display any messages or errors
