@@ -1,4 +1,4 @@
-import { object, string, z } from "zod";
+import { object, string, array } from "zod";
 
 export const SignInSchema = object({
   email: string().email("Invalid Email"),
@@ -24,3 +24,10 @@ export const RegisterSchema = object({
 export const AddCategorySchema = object({
   name: string().min(1, "Category name is required"),
 })
+
+export const AddNovelSchema = object({
+  title: string().min(1, "Title is required"),
+  content: string().min(1, "Content is required"),
+  tags: array(string()).nonempty("At least one tag is required"),
+  categoryId: string().min(1, "Category ID is required"),
+});

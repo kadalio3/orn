@@ -1,5 +1,5 @@
 "use server";
-import { RegisterSchema, SignInSchema, AddCategorySchema } from "@/lib/zod";
+import { RegisterSchema, SignInSchema, AddCategorySchema, AddNovelSchema } from "@/lib/zod";
 import { hashSync } from "bcrypt-ts";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -103,5 +103,38 @@ export const updateCategory = async (categoryId: string, updatedData: { name: st
   } catch (error) {
     console.error("Failed to update category:", error);
     return { message: "Failed to update category", success: false };
+  }
+};
+
+export const createNovel = async (prevState: any, formData: FormData) => {
+  const session = await auth();
+  
+  if (!session || !session.user || !session.user.id) {
+    return { message: "User is not authenticated or missing user ID" };
+  }
+
+  // Validate form data using Zod schema
+  const validatedFields = AddNovelSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    return { error: validatedFields.error.flatten().fieldErrors };
+  }
+
+  try {
+    // Create the novel entry in the database
+    await prisma.novel.create({
+      data: {
+        title: validatedFields.data.title,
+        content: validatedFields.data.content,
+        tags: validatedFields.data.tags,
+        author: { connect: { id: session.user.id } }, // Connect with the authenticated user
+        category: { connect: { id: validatedFields.data.categoryId } }, // Connect with selected category
+      },
+    });
+
+    return { message: "Novel created successfully", success: true };
+  } catch (error) {
+    console.error("Failed to create novel:", error);
+    return { message: "Failed to create novel", success: false };
   }
 };
