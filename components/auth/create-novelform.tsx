@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, FormEvent } from "react";
+import { createNovel } from "@/lib/actions"; // Import backend action
 
 interface Author {
   id: string;
@@ -13,47 +14,38 @@ interface Category {
 }
 
 interface CreateNovelFormProps {
-  authors?: Author[];
-  categories?: Category[];
+  categories: Category[]; // Categories are passed as a prop
 }
 
-import { createNovel } from "@/lib/actions"; // Placeholder action for creating a novel
-
-const CreateNovelForm: React.FC<CreateNovelFormProps> = ({ authors = [], categories = [] }) => {
+const CreateNovelForm: React.FC<CreateNovelFormProps> = ({ categories }) => {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [tags, setTags] = useState<string>("");
-  const [authorId, setAuthorId] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const tagsArray = tags.split(",").map(tag => tag.trim());
-
-    const novelData = {
-      title,
-      content,
-      tags: tagsArray,
-      authorId,
-      categoryId,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("tags", tags);
+    formData.append("categoryId", categoryId);
 
     try {
-      const response = await createNovel({}, novelData);
-      if (response?.success) {
+      const response = await createNovel({}, formData);
+      if (response.success) {
         setMessage("Novel created successfully!");
         setTitle("");
         setContent("");
         setTags("");
-        setAuthorId("");
         setCategoryId("");
       } else {
-        setMessage("Failed to create novel.");
+        setMessage(response.message || "Failed to create novel.");
       }
     } catch (error) {
-      setMessage("Error creating novel.");
+      setMessage("An error occurred while creating the novel.");
     }
   };
 
@@ -103,26 +95,6 @@ const CreateNovelForm: React.FC<CreateNovelFormProps> = ({ authors = [], categor
       </div>
 
       <div>
-        <label htmlFor="authorId" className="block text-sm font-medium text-gray-700">
-          Author
-        </label>
-        <select
-          id="authorId"
-          value={authorId}
-          onChange={(e) => setAuthorId(e.target.value)}
-          required
-          className="mt-1 block w-full p-2 border border-gray-300 rounded"
-        >
-          <option value="">Select an author</option>
-          {authors.map((author: Author) => (
-            <option key={author.id} value={author.id}>
-              {author.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
         <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
           Category
         </label>
@@ -134,7 +106,7 @@ const CreateNovelForm: React.FC<CreateNovelFormProps> = ({ authors = [], categor
           className="mt-1 block w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Select a category</option>
-          {categories.map((category: Category) => (
+          {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>

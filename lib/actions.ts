@@ -106,33 +106,37 @@ export const updateCategory = async (categoryId: string, updatedData: { name: st
   }
 };
 
-export const createNovel = async (prevState: any, formData: FormData) => {
+export const createNovel = async (prevState: unknown, formData: FormData) => {
   const session = await auth();
-  
   if (!session || !session.user || !session.user.id) {
-    return { message: "User is not authenticated or missing user ID" };
+    return { message: "User is not authenticated or missing user ID", success: false };
   }
 
-  // Validate form data using Zod schema
-  const validatedFields = AddNovelSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = AddNovelSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (!validatedFields.success) {
-    return { error: validatedFields.error.flatten().fieldErrors };
+    return {
+      error: validatedFields.error.flatten().fieldErrors,
+      success: false,
+    };
   }
 
+  const { title, content, tags, categoryId } = validatedFields.data;
+
   try {
-    // Create the novel entry in the database
-    await prisma.novel.create({
+    const novel = await prisma.novel.create({
       data: {
-        title: validatedFields.data.title,
-        content: validatedFields.data.content,
-        tags: validatedFields.data.tags,
-        author: { connect: { id: session.user.id } }, // Connect with the authenticated user
-        category: { connect: { id: validatedFields.data.categoryId } }, // Connect with selected category
+        title,
+        content,
+        tags,
+        category: { connect: { id: categoryId } },
+        author: { connect: { id: session.user.id } },
       },
     });
 
-    return { message: "Novel created successfully", success: true };
+    return { message: "Novel created successfully!", success: true, data: novel };
   } catch (error) {
     console.error("Failed to create novel:", error);
     return { message: "Failed to create novel", success: false };

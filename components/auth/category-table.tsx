@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { FiEdit, FiTrash, FiPlus } from "react-icons/fi";
 import ProductForm from "./create-form";
-import { deleteCategory } from "@/lib/actions"; // Adjust the path if necessary
+import { deleteCategory } from "@/lib/actions";
+import { formatDate } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -80,8 +81,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ categories, onDeleteSucce
             <tr key={category.id} className="border-b border-gray-100">
               <td className="py-3 px-6">{index + 1}</td>
               <td className="py-3 px-6">{category.name}</td>
-              <td className="py-3 px-6">{category.createdAt.toString()}</td>
-              <td className="py-3 px-6">{category.updatedAt.toString()}</td>
+              <td className="py-3 px-6">{formatDate(category.createdAt.toString())}</td>
+              <td className="py-3 px-6">{formatDate(category.updatedAt.toString())}</td>
               <td className="py-3 px-6">
                 <div className="flex space-x-2">
                   <button className="text-blue-500 hover:text-blue-700">
